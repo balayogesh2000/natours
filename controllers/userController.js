@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const factory = require("./handlerFactory");
 
 const filterObj = (obj, ...keys) => {
   const filteredObj = {};
@@ -9,15 +10,6 @@ const filterObj = (obj, ...keys) => {
   });
   return filteredObj;
 };
-
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-  res.status(200).json({
-    status: "success",
-    results: users.length,
-    users
-  });
-});
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Create Error if user posts password data
@@ -53,28 +45,20 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
+exports.createUser = (req, res, next) => {
   res.status(500).json({
-    status: "success",
-    message: "Routes not yet created for this endpoint"
+    status: "error",
+    message: "This route is not defined! Please use /signup instead"
   });
 };
-exports.createUser = async (req, res) => {
-  const newUser = await User.create(req.body);
-  res.status(500).json({
-    status: "success",
-    user: newUser
-  });
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
 };
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: "success",
-    message: "Routes not yet created for this endpoint"
-  });
-};
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: "success",
-    message: "Routes not yet created for this endpoint"
-  });
-};
+
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User);
+// Do not update password with this!
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);
