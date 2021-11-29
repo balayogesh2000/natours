@@ -7,10 +7,12 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const csp = require("express-csp");
 
 const toursRouter = require("./routes/tourRoutes");
 const usersRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
+const bookingRouter = require("./routes/bookingRoutes");
 const viewRouter = require("./routes/viewRoutes");
 
 const AppError = require("./utils/appError");
@@ -25,7 +27,83 @@ console.log(process.env.NODE_ENV);
 // 1) Global Middlewares
 
 // set Security HTTP headers
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'", "https:", "http:", "data:", "ws:"],
+      baseUri: ["'self'"],
+      fontSrc: ["'self'", "https:", "http:", "data:"],
+      scriptSrc: ["'self'", "https:", "http:", "blob:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:", "http:"]
+    }
+  })
+);
+
+csp.extend(app, {
+  policy: {
+    directives: {
+      "default-src": ["self"],
+      "style-src": ["self", "unsafe-inline", "https:"],
+      "font-src": ["self", "https://fonts.gstatic.com"],
+      "script-src": [
+        "self",
+        "unsafe-inline",
+        "data",
+        "blob",
+        "https://js.stripe.com",
+        "https://*.mapbox.com",
+        "https://*.cloudflare.com/",
+        "https://bundle.js:8828",
+        "ws://localhost:56558/"
+      ],
+      "worker-src": [
+        "self",
+        "unsafe-inline",
+        "data:",
+        "blob:",
+        "https://*.stripe.com",
+        "https://*.mapbox.com",
+        "https://*.cloudflare.com/",
+        "https://bundle.js:*",
+        "ws://localhost:*/"
+      ],
+      "frame-src": [
+        "self",
+        "unsafe-inline",
+        "data:",
+        "blob:",
+        "https://*.stripe.com",
+        "https://*.mapbox.com",
+        "https://*.cloudflare.com/",
+        "https://bundle.js:*",
+        "ws://localhost:*/"
+      ],
+      "img-src": [
+        "self",
+        "unsafe-inline",
+        "data:",
+        "blob:",
+        "https://*.stripe.com",
+        "https://*.mapbox.com",
+        "https://*.cloudflare.com/",
+        "https://bundle.js:*",
+        "ws://localhost:*/"
+      ],
+      "connect-src": [
+        "self",
+        "unsafe-inline",
+        "data:",
+        "blob:",
+        "wss://<HEROKU-SUBDOMAIN>.herokuapp.com:<PORT>/",
+        "https://*.stripe.com",
+        "https://*.mapbox.com",
+        "https://*.cloudflare.com/",
+        "https://bundle.js:*",
+        "ws://localhost:*/"
+      ]
+    }
+  }
+});
 
 // Limit requests from same  API
 const limiter = rateLimit({
@@ -77,7 +155,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   // console.log(req.headers)
-  console.log(req.cookies);
+  // console.log(req.cookies);
   next();
 });
 
@@ -85,6 +163,7 @@ app.use((req, res, next) => {
 app.use("/api/v1/tours", toursRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/bookings", bookingRouter);
 app.use("/", viewRouter);
 
 app.all("*", (req, res, next) => {
