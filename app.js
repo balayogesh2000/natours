@@ -15,6 +15,7 @@ const toursRouter = require("./routes/tourRoutes");
 const usersRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const bookingRouter = require("./routes/bookingRoutes");
+const bookingController = require("./controllers/bookingController");
 const viewRouter = require("./routes/viewRoutes");
 
 const AppError = require("./utils/appError");
@@ -129,6 +130,13 @@ const limiter = rateLimit({
 });
 
 app.use("/api", limiter);
+
+// We need to put stripe webhook in app.js because we need raw body and it should not be parsed into json
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  bookingController.webhookCheckout
+);
 
 // Body parser, reading data from the body into req.body
 app.use(
