@@ -9,6 +9,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const csp = require("express-csp");
 const compression = require("compression");
+const cors = require("cors");
 
 const toursRouter = require("./routes/tourRoutes");
 const usersRouter = require("./routes/userRoutes");
@@ -28,6 +29,18 @@ app.set("views", path.join(__dirname, "views"));
 
 // console.log(process.env.NODE_ENV);
 // 1) Global Middlewares
+
+// Implement cors
+app.use(cors());
+// Acess-Control-Allow-Origin *
+// api.natours.com, front-end natours.com
+// app.use(
+//   cors({
+//     origin: "https://www.natours.com"
+//   })
+// );
+app.options("*", cors());
+// app.options("/api/v1/tours/:id", cors());
 
 // set Security HTTP headers
 app.use(
