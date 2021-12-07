@@ -8,6 +8,7 @@ const hpp = require("hpp");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const csp = require("express-csp");
+const compression = require("compression");
 
 const toursRouter = require("./routes/tourRoutes");
 const usersRouter = require("./routes/userRoutes");
@@ -23,7 +24,7 @@ const app = express();
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 // 1) Global Middlewares
 
 // set Security HTTP headers
@@ -150,6 +151,8 @@ if (process.env.NODE_ENV === "development") {
 
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(compression());
 
 // Test middleware
 app.use((req, res, next) => {

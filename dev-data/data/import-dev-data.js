@@ -62,4 +62,4 @@ switch (process.argv[2]) {
   default:
 }
 
-console.log(process.argv);
+// console.log(process.argv);

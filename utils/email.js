@@ -13,7 +13,7 @@ module.exports = class Email {
   }
 
   newTransport() {
-    console.log(process.env.SENDINBLUE_PASSWORD);
+    // console.log(process.env.SENDINBLUE_PASSWORD);
     if (process.env.NODE_ENV === "production") {
       // sendinblue
       return nodemailer.createTransport({
