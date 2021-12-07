@@ -7,7 +7,7 @@ const Review = require("../../models/reviewModel");
 
 dotenv.config({ path: `${__dirname}/../../config.env` });
 
-const DB = process.env.DATABASE_LOCAL.replace(
+const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
   process.env.DATABASE_PASSWORD
 );
